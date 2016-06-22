@@ -15,9 +15,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 
 public class InputController {
 
+	private static final String TooltipText = "Supply time stamp in any of the following format:"
+			+ "\n\tdefault (no suffix) [s]"
+			+ "\n\t <stamp>ns [ns]"
+			+ "\n\t <stamp>mics [micro seconds]"
+			+ "\n\t <stamp>s [s]"
+			+ "\n\t <stamp>ms [milli seconds]";
 	@FXML
     private Label timeInMs;
     @FXML
@@ -55,6 +62,7 @@ public class InputController {
     private void initialize() {
     	clearData();
     	showDateData(LocalDateTime.now());
+    	mTextField.setTooltip(new Tooltip(TooltipText));
     }
 
     public void setConverterGui(ConverterGui pGui) {
@@ -64,7 +72,6 @@ public class InputController {
     private void showDateData(LocalDateTime pLocalDateTime) {
 
     	if (null != pLocalDateTime) {
-
     		ZonedDateTime tZonedTime = ZonedDateTime.of(pLocalDateTime, ZoneId.systemDefault());
     		ZonedDateTime tUTCTime;
     		if (mUtcTimeZone.isSelected()) {
@@ -77,6 +84,7 @@ public class InputController {
     		timeInS.setText(String.valueOf(tUTCTime.toInstant().toEpochMilli()/1000));
     		timeInIsoStd.setText(tUTCTime.format(DateTimeFormatter.ISO_DATE_TIME));
     		mCachedLTD = pLocalDateTime;
+    		mDatePicker.setValue(pLocalDateTime.toLocalDate());
     	} else {
     		clearData();
     	}
@@ -96,7 +104,6 @@ public class InputController {
 
     @FXML
     private void onTimeStampSupplied() {
-    	mDatePicker.setValue(LocalDate.now());
     	String tSuppliedStamp = mTextField.getText().trim();
     	if (null == tSuppliedStamp || tSuppliedStamp.isEmpty()) {
     		setInvalidText();
