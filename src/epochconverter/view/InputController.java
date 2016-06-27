@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 
+import epochconverter.Calculators;
 import epochconverter.ConverterGui;
 import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
@@ -25,6 +26,11 @@ public class InputController {
 			+ "\n\t <stamp>mics [micro seconds]"
 			+ "\n\t <stamp>s [s]"
 			+ "\n\t <stamp>ms [milli seconds]";
+	private static final String ms = "ms";
+	private static final String ns = "ns";
+	private static final String mics = "mics";
+	private static final String s = "s";
+
 	@FXML
     private Label timeInMs;
     @FXML
@@ -41,13 +47,18 @@ public class InputController {
     private TextField mTextField;
 
     @FXML
-    private ToggleGroup mTimeZoneToggleGroup;
+    private ToggleGroup mInputTimeZoneToggleGroup;
+    @FXML
+    private RadioButton mInputLocalTimeZone;
+    @FXML
+    private RadioButton mInputUtcTimeZone;
 
     @FXML
-    private RadioButton mLocalTimeZone;
-
+    private ToggleGroup mDisplayTimeZoneToggleGroup;
     @FXML
-    private RadioButton mUtcTimeZone;
+    private RadioButton mDisplayLocalTimeZone;
+    @FXML
+    private RadioButton mDisplayUtcTimeZone;
 
     // Reference to the main application.
     private ConverterGui mEpochGui;
@@ -61,7 +72,9 @@ public class InputController {
     @FXML
     private void initialize() {
     	clearData();
-    	showDateData(LocalDateTime.now());
+		ZonedDateTime tZonedTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault());
+    	displayTimeFieldsInGui(tZonedTime.withZoneSameInstant(ZoneOffset.UTC));
+    	mCachedLTD = tZonedTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     	mTextField.setTooltip(new Tooltip(TooltipText));
     }
 
@@ -69,20 +82,16 @@ public class InputController {
     	this.mEpochGui = pGui;
     }
 
-    private void showDateData(LocalDateTime pLocalDateTime) {
+    private void convertAndShowDateData(LocalDateTime pLocalDateTime) {
 
     	if (null != pLocalDateTime) {
-    		ZonedDateTime tZonedTime = ZonedDateTime.of(pLocalDateTime, ZoneId.systemDefault());
-    		ZonedDateTime tUTCTime;
-    		if (mUtcTimeZone.isSelected()) {
-    			tUTCTime = pLocalDateTime.atZone(ZoneOffset.UTC);
-    		} else {
-    			tUTCTime = tZonedTime.withZoneSameInstant(ZoneOffset.UTC);
-    		}
-    		timeInEpochDays.setText(String.valueOf(tUTCTime.getLong(ChronoField.EPOCH_DAY)));
-    		timeInMs.setText(String.valueOf(tUTCTime.toInstant().toEpochMilli()));
-    		timeInS.setText(String.valueOf(tUTCTime.toInstant().toEpochMilli()/1000));
-    		timeInIsoStd.setText(tUTCTime.format(DateTimeFormatter.ISO_DATE_TIME));
+    		LocalDateTime tConvertedTime;
+    		ZoneId tFromZone = mInputUtcTimeZone.isSelected() ? ZoneOffset.UTC : ZoneId.systemDefault();
+    		ZoneId tToZone = mDisplayUtcTimeZone.isSelected() ? ZoneOffset.UTC : ZoneId.systemDefault();
+
+    		tConvertedTime = Calculators.convertToTimeZone(pLocalDateTime, tFromZone, tToZone);
+    		ZonedDateTime tDisplayTime = tConvertedTime.atZone(tToZone);
+    		displayTimeFieldsInGui(tDisplayTime);
     		mCachedLTD = pLocalDateTime;
     		mDatePicker.setValue(pLocalDateTime.toLocalDate());
     	} else {
@@ -90,16 +99,23 @@ public class InputController {
     	}
     }
 
+    private void displayTimeFieldsInGui(ZonedDateTime pUTCTime) {
+    	timeInEpochDays.setText(String.valueOf(pUTCTime.getLong(ChronoField.EPOCH_DAY)));
+		timeInMs.setText(String.valueOf(pUTCTime.toInstant().toEpochMilli()));
+		timeInS.setText(String.valueOf(pUTCTime.toInstant().toEpochMilli()/1000));
+		timeInIsoStd.setText(pUTCTime.format(DateTimeFormatter.ISO_DATE_TIME));
+    }
+
     @FXML
     private void onDatePicked() {
     	LocalDate tLD = mDatePicker.getValue();
-    	showDateData(tLD.atStartOfDay());
+    	convertAndShowDateData(tLD.atStartOfDay());
     }
 
     @FXML
     private void onChangedRadioButton() {
     	//Recalc time
-    	showDateData(mCachedLTD);
+    	convertAndShowDateData(mCachedLTD);
     }
 
     @FXML
@@ -110,38 +126,25 @@ public class InputController {
     		return;
     	}
     	try {
-			if (tSuppliedStamp.toLowerCase().endsWith("ms")) {
-				long tStamp = Long.parseLong(tSuppliedStamp.substring(0, tSuppliedStamp.length() - 2));
-				long tSec = tStamp / 1000;
-				int tNano = (int) ((tStamp % 1000) * 1_000_000);
-				LocalDateTime tLDT = LocalDateTime.ofEpochSecond(tSec, tNano, ZoneOffset.UTC);
-				showDateData(tLDT);
+			if (tSuppliedStamp.toLowerCase().endsWith(ms)) {
+				LocalDateTime tLDT = getLDT(tSuppliedStamp, ms);
+				convertAndShowDateData(tLDT);
 				return;
-			} else if (tSuppliedStamp.toLowerCase().endsWith("ns")) {
-				long tStamp = Long.parseLong(tSuppliedStamp.substring(0, tSuppliedStamp.length() - 2));
-				long tSec = tStamp / 1_000_000_000;
-				int tNano = (int) ((tStamp % 1_000_000_000));
-				LocalDateTime tLDT = LocalDateTime.ofEpochSecond(tSec, tNano, ZoneOffset.UTC);
-				showDateData(tLDT);
+			} else if (tSuppliedStamp.toLowerCase().endsWith(ns)) {
+				LocalDateTime tLDT = getLDT(tSuppliedStamp, ns);
+				convertAndShowDateData(tLDT);
 				return;
-			} else if (tSuppliedStamp.toLowerCase().endsWith("mics")) {
-				long tStamp = Long.parseLong(tSuppliedStamp.substring(0, tSuppliedStamp.length() - 4));
-				long tSec = tStamp / 1_000_000;
-				int tNano = (int) ((tStamp % 1_000_000) * 1000);
-				LocalDateTime tLDT = LocalDateTime.ofEpochSecond(tSec, tNano, ZoneOffset.UTC);
-				showDateData(tLDT);
+			} else if (tSuppliedStamp.toLowerCase().endsWith(mics)) {
+				LocalDateTime tLDT = getLDT(tSuppliedStamp, mics);
+				convertAndShowDateData(tLDT);
 				return;
-			} else if (tSuppliedStamp.toLowerCase().endsWith("s")) {
-				long tStamp = Long.parseLong(tSuppliedStamp.substring(0, tSuppliedStamp.length() - 4));
-				long tSec = tStamp;
-				int tNano = 0;
-				LocalDateTime tLDT = LocalDateTime.ofEpochSecond(tSec, tNano, ZoneOffset.UTC);
-				showDateData(tLDT);
+			} else if (tSuppliedStamp.toLowerCase().endsWith(s)) {
+				LocalDateTime tLDT = getLDT(tSuppliedStamp, s);
+				convertAndShowDateData(tLDT);
 				return;
 			} else {
-				long tStamp = Long.parseLong(tSuppliedStamp);
-				LocalDateTime tLDT = LocalDateTime.ofEpochSecond(tStamp, 0, ZoneOffset.UTC);
-				showDateData(tLDT);
+				LocalDateTime tLDT = getLDT(tSuppliedStamp, null);
+				convertAndShowDateData(tLDT);
 				return;
 			}
     	} catch (NumberFormatException e) {
@@ -150,6 +153,13 @@ public class InputController {
     	setInvalidText();
     }
 
+    private LocalDateTime getLDT(String pTimeStamp, String pSuffix) {
+    	if (null == pSuffix) {
+    		pSuffix = "";
+    	}
+    	return Calculators.getLocalDateTimeFromStamp(pTimeStamp.substring(0, pTimeStamp.length() - pSuffix.length()),
+    			pSuffix);
+    }
     private void setInvalidText() {
     	mTextField.getParent().requestFocus();
     	mTextField.clear();
