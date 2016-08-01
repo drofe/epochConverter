@@ -78,4 +78,16 @@ public class CalculatorsTest {
 		assertEquals(15, tLDT.getSecond());
 	}
 
+	@Test
+	public void testEpochToDateTime() {
+
+		LocalDateTime tLDT = Calculators.getDateFromEpochDay(17000);
+		assertEquals(2016, tLDT.getYear());
+		assertEquals(7, tLDT.getMonthValue());
+		assertEquals(18, tLDT.getDayOfMonth());
+		assertEquals(00, tLDT.getHour());
+		assertEquals(00, tLDT.getMinute());
+		assertEquals(00, tLDT.getSecond());
+	}
+
 }

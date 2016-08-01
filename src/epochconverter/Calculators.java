@@ -3,6 +3,7 @@ package epochconverter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -43,6 +44,10 @@ public class Calculators {
     		return null;
     	}
 
+    }
+
+    public static LocalDateTime getDateFromEpochDay(long pEpochDay) {
+    	return LocalDateTime.of(LocalDate.ofEpochDay(pEpochDay), LocalTime.MIDNIGHT);
     }
 
     public static LocalDateTime getLocalDateTimeFromStamp(String pStamp, String pSuffix) {

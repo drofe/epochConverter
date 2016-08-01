@@ -44,7 +44,10 @@ public class InputController {
     private DatePicker mDatePicker;
 
     @FXML
-    private TextField mTextField;
+    private TextField mTimeStampField;
+
+    @FXML
+    private TextField mEpochDayField;
 
     @FXML
     private ToggleGroup mInputTimeZoneToggleGroup;
@@ -75,7 +78,7 @@ public class InputController {
 		ZonedDateTime tZonedTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.systemDefault());
     	displayTimeFieldsInGui(tZonedTime.withZoneSameInstant(ZoneOffset.UTC));
     	mCachedLTD = tZonedTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
-    	mTextField.setTooltip(new Tooltip(TooltipText));
+    	mTimeStampField.setTooltip(new Tooltip(TooltipText));
     }
 
     public void setConverterGui(ConverterGui pGui) {
@@ -119,38 +122,56 @@ public class InputController {
     }
 
     @FXML
+    private void onEpochDaySupplied() {
+    	long tEpochDay = 0;
+    	try {
+    		tEpochDay = Long.valueOf(mEpochDayField.getText().trim());
+    	} catch (NumberFormatException e) {
+    		mEpochDayField.clear();
+    		mEpochDayField.setText(null);
+    		mEpochDayField.getParent().requestFocus();
+    		mEpochDayField.setPromptText("Valid number only.");
+    		return;
+    	}
+    	LocalDateTime tLDT = Calculators.getDateFromEpochDay(tEpochDay);
+    	mTimeStampField.clear();
+    	convertAndShowDateData(tLDT);
+    }
+
+    @FXML
     private void onTimeStampSupplied() {
-    	String tSuppliedStamp = mTextField.getText().trim();
+    	String tSuppliedStamp = mTimeStampField.getText().trim();
     	if (null == tSuppliedStamp || tSuppliedStamp.isEmpty()) {
     		setInvalidText();
     		return;
     	}
     	try {
 			if (tSuppliedStamp.toLowerCase().endsWith(ms)) {
-				LocalDateTime tLDT = getLDT(tSuppliedStamp, ms);
-				convertAndShowDateData(tLDT);
+				setDataFromTimeStamp(tSuppliedStamp, ms);
 				return;
 			} else if (tSuppliedStamp.toLowerCase().endsWith(ns)) {
-				LocalDateTime tLDT = getLDT(tSuppliedStamp, ns);
-				convertAndShowDateData(tLDT);
+				setDataFromTimeStamp(tSuppliedStamp, ns);
 				return;
 			} else if (tSuppliedStamp.toLowerCase().endsWith(mics)) {
-				LocalDateTime tLDT = getLDT(tSuppliedStamp, mics);
-				convertAndShowDateData(tLDT);
+				setDataFromTimeStamp(tSuppliedStamp, mics);
 				return;
 			} else if (tSuppliedStamp.toLowerCase().endsWith(s)) {
-				LocalDateTime tLDT = getLDT(tSuppliedStamp, s);
-				convertAndShowDateData(tLDT);
+				setDataFromTimeStamp(tSuppliedStamp, s);
 				return;
 			} else {
-				LocalDateTime tLDT = getLDT(tSuppliedStamp, null);
-				convertAndShowDateData(tLDT);
+				setDataFromTimeStamp(tSuppliedStamp, null);
 				return;
 			}
     	} catch (NumberFormatException e) {
     		//By design
     	}
     	setInvalidText();
+    }
+
+    private void setDataFromTimeStamp(String pSuppliedStamp, String pSuffix) {
+		LocalDateTime tLDT = getLDT(pSuppliedStamp, pSuffix);
+		mEpochDayField.clear();
+		convertAndShowDateData(tLDT);
     }
 
     private LocalDateTime getLDT(String pTimeStamp, String pSuffix) {
@@ -161,14 +182,16 @@ public class InputController {
     			pSuffix);
     }
     private void setInvalidText() {
-    	mTextField.getParent().requestFocus();
-    	mTextField.clear();
-    	mTextField.setPromptText("Supplied value was incompatible.");
+    	mTimeStampField.getParent().requestFocus();
+    	mTimeStampField.clear();
+    	mTimeStampField.setPromptText("Supplied value was incompatible.");
     }
     private void clearData() {
     	timeInMs.setText("");
     	timeInS.setText("");
     	timeInIsoStd.setText("");
     	timeInEpochDays.setText("");
+    	mEpochDayField.clear();
+    	mTimeStampField.clear();
     }
 }
