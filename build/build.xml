@@ -33,12 +33,17 @@
 		<mkdir dir="project" />
 		<copy todir="project">
 			<fileset dir="/home/ola/hacks/epochConverter">
+				<include name="test/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="/home/ola/hacks/epochConverter">
 				<include name="src/**" />
 			</fileset>
 		</copy>
 		<copy todir="project">
 			<fileset dir="/home/ola/hacks/epochConverter">
-				<include name="test/**" />
+				<include name="Resources/**" />
 			</fileset>
 		</copy>
 	
@@ -71,6 +76,11 @@
 				<include name="**/*"/>
 			</fileset>
 		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/Resources">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
 	
 		<javac includeantruntime="false" source="1.8" target="1.8" srcdir="build/src" destdir="build/classes" encoding="UTF-8">
 			<classpath>
@@ -86,6 +96,9 @@
 			<exclude name="**/*.java"/>
 		</fileset>
 		<fileset dir="project/src">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/Resources">
 			<exclude name="**/*.java"/>
 		</fileset>
 		</copy>
@@ -143,7 +156,7 @@
 			includeDT="false"
 			offlineAllowed="true"
 			outdir="${basedir}/deploy"
-			outfile="epochConverter" nativeBundles="none"
+			outfile="epochConverter" nativeBundles="exe"
 			updatemode="background" >
 	
 			<fx:platform basedir="${java.home}"/>

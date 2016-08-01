@@ -1,5 +1,6 @@
 package epochconverter.view;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -17,6 +18,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class InputController {
 
@@ -31,6 +34,8 @@ public class InputController {
 	private static final String mics = "mics";
 	private static final String s = "s";
 
+	@FXML
+	private ImageView mImageView;
 	@FXML
     private Label timeInMs;
     @FXML
@@ -79,6 +84,11 @@ public class InputController {
     	displayTimeFieldsInGui(tZonedTime.withZoneSameInstant(ZoneOffset.UTC));
     	mCachedLTD = tZonedTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     	mTimeStampField.setTooltip(new Tooltip(TooltipText));
+    	InputStream tImageStream = getClass().getResourceAsStream("/images/Epoch.png");
+    	if (null != tImageStream) {
+    		final Image tImg = new Image(tImageStream);
+    		mImageView.setImage(tImg);
+    	}
     }
 
     public void setConverterGui(ConverterGui pGui) {
