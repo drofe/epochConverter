@@ -11,7 +11,10 @@ import java.time.temporal.ChronoField;
 
 import epochconverter.Calculators;
 import epochconverter.ConverterGui;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -31,7 +34,7 @@ public class InputController {
 			+ "\n\t <stamp>ms [milli seconds]";
 	private static final String ms = "ms";
 	private static final String ns = "ns";
-	private static final String mics = "mics";
+	private static final String mics = "\u00B5s";
 	private static final String s = "s";
 
 	@FXML
@@ -68,6 +71,9 @@ public class InputController {
     @FXML
     private RadioButton mDisplayUtcTimeZone;
 
+    @FXML
+    private ComboBox<String> mUnitPicker;
+
     // Reference to the main application.
     private ConverterGui mEpochGui;
     private LocalDateTime mCachedLTD;
@@ -89,6 +95,10 @@ public class InputController {
     		final Image tImg = new Image(tImageStream);
     		mImageView.setImage(tImg);
     	}
+    	ObservableList<String> tUnits = FXCollections.observableArrayList(s, mics, ms, ns);
+    	mUnitPicker.setItems(tUnits);
+    	mUnitPicker.setValue(s);
+
     }
 
     public void setConverterGui(ConverterGui pGui) {
@@ -104,9 +114,10 @@ public class InputController {
 
     		tConvertedTime = Calculators.convertToTimeZone(pLocalDateTime, tFromZone, tToZone);
     		ZonedDateTime tDisplayTime = tConvertedTime.atZone(tToZone);
+    		mDatePicker.setValue(pLocalDateTime.toLocalDate());
     		displayTimeFieldsInGui(tDisplayTime);
     		mCachedLTD = pLocalDateTime;
-    		mDatePicker.setValue(pLocalDateTime.toLocalDate());
+
     	} else {
     		clearData();
     	}
@@ -156,22 +167,8 @@ public class InputController {
     		return;
     	}
     	try {
-			if (tSuppliedStamp.toLowerCase().endsWith(ms)) {
-				setDataFromTimeStamp(tSuppliedStamp, ms);
-				return;
-			} else if (tSuppliedStamp.toLowerCase().endsWith(ns)) {
-				setDataFromTimeStamp(tSuppliedStamp, ns);
-				return;
-			} else if (tSuppliedStamp.toLowerCase().endsWith(mics)) {
-				setDataFromTimeStamp(tSuppliedStamp, mics);
-				return;
-			} else if (tSuppliedStamp.toLowerCase().endsWith(s)) {
-				setDataFromTimeStamp(tSuppliedStamp, s);
-				return;
-			} else {
-				setDataFromTimeStamp(tSuppliedStamp, null);
-				return;
-			}
+			setDataFromTimeStamp(tSuppliedStamp, mUnitPicker.getValue());
+			return;
     	} catch (NumberFormatException e) {
     		//By design
     	}
@@ -188,8 +185,7 @@ public class InputController {
     	if (null == pSuffix) {
     		pSuffix = "";
     	}
-    	return Calculators.getLocalDateTimeFromStamp(pTimeStamp.substring(0, pTimeStamp.length() - pSuffix.length()),
-    			pSuffix);
+    	return Calculators.getLocalDateTimeFromStamp(pTimeStamp, pSuffix);
     }
     private void setInvalidText() {
     	mTimeStampField.getParent().requestFocus();

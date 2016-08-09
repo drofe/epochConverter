@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -21,10 +21,10 @@
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="158.0" prefWidth="548.0">
                      <children>
-                        <TextField fx:id="mTimeStampField" layoutX="286.0" layoutY="74.0" onAction="#onTimeStampSupplied" prefHeight="26.0" prefWidth="235.0" />
-                        <DatePicker fx:id="mDatePicker" layoutX="286.0" layoutY="40.0" onAction="#onDatePicked" />
-                        <Label alignment="CENTER_RIGHT" layoutX="130.0" layoutY="79.0" prefHeight="16.0" prefWidth="144.0" text="Supply time stamp" textAlignment="RIGHT" />
-                        <Label alignment="CENTER_RIGHT" layoutX="177.0" layoutY="45.0" prefHeight="16.0" prefWidth="83.0" text="Pick a date" textAlignment="RIGHT" />
+                        <TextField fx:id="mTimeStampField" layoutX="260.0" layoutY="74.0" onAction="#onTimeStampSupplied" prefHeight="26.0" prefWidth="197.0" />
+                        <DatePicker fx:id="mDatePicker" layoutX="261.0" layoutY="40.0" onAction="#onDatePicked" prefHeight="26.0" prefWidth="162.0" />
+                        <Label alignment="CENTER_RIGHT" layoutX="109.0" layoutY="77.0" prefHeight="16.0" prefWidth="144.0" text="Supply time stamp" textAlignment="RIGHT" />
+                        <Label alignment="CENTER_RIGHT" layoutX="164.0" layoutY="45.0" prefHeight="16.0" prefWidth="83.0" text="Pick a date" textAlignment="RIGHT" />
                         <RadioButton fx:id="mInputLocalTimeZone" layoutX="299.0" layoutY="14.0" mnemonicParsing="false" onAction="#onChangedRadioButton" selected="true" text="Local time zone">
                            <toggleGroup>
                               <ToggleGroup fx:id="mInputTimeZoneToggleGroup" />
@@ -38,11 +38,12 @@
                            </toggleGroup>
                         </RadioButton>
                         <RadioButton fx:id="mDisplayUtcTimeZone" layoutX="433.0" layoutY="140.0" mnemonicParsing="false" onAction="#onChangedRadioButton" selected="true" text="UTC" toggleGroup="$mDisplayTimeZoneToggleGroup" />
-                        <TextField fx:id="mEpochDayField" layoutX="286.0" layoutY="106.0" onAction="#onEpochDaySupplied" />
-                        <Label layoutX="137.0" layoutY="111.0" text="Supply an epoch day" />
+                        <TextField fx:id="mEpochDayField" layoutX="260.0" layoutY="106.0" onAction="#onEpochDaySupplied" prefHeight="26.0" prefWidth="91.0" />
+                        <Label layoutX="113.0" layoutY="111.0" prefHeight="16.0" prefWidth="144.0" text=" Supply an epoch day" />
                         <Label layoutX="491.0" layoutY="45.0" text="or" />
-                        <Label layoutX="528.0" layoutY="77.0" text="or" />
-                        <ImageView fx:id="mImageView" fitHeight="70.0" fitWidth="107.0" layoutX="14.0" layoutY="41.0" pickOnBounds="true" preserveRatio="true"></ImageView>
+                        <Label layoutX="528.0" layoutY="77.0" prefHeight="16.0" prefWidth="20.0" text=" or" />
+                        <ImageView fx:id="mImageView" fitHeight="70.0" fitWidth="107.0" layoutX="14.0" layoutY="41.0" pickOnBounds="true" preserveRatio="true" />
+                        <ComboBox fx:id="mUnitPicker" layoutX="461.0" layoutY="74.0" onAction="#onTimeStampSupplied" prefHeight="26.0" prefWidth="67.0" promptText="Unit" />
                      </children>
                   </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
