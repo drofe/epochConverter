@@ -10,6 +10,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 
+import epochconverter.view.InputController;
+
 public class Calculators {
 
     private Calculators() {
@@ -56,16 +58,16 @@ public class Calculators {
     	}
     	long tDivisor = 0;
     	switch (pSuffix) {
-    		case "ns":
+    		case InputController.ns:
     			tDivisor = 1_000_000_000;
     			break;
-    		case "ms":
+    		case InputController.ms:
     			tDivisor = 1_000;
     			break;
-    		case "mics":
+    		case InputController.mics:
     			tDivisor = 1_000_000;
     			break;
-    		case "s":
+    		case InputController.s:
     		default:
     			tDivisor = 1;
     	}

@@ -26,16 +26,17 @@ import javafx.scene.image.ImageView;
 
 public class InputController {
 
+	public static final String ms = "ms";
+	public static final String ns = "ns";
+	public static final String mics = "\u00B5s";
+	public static final String s = "s";
+
 	private static final String TooltipText = "Supply time stamp in any of the following format:"
 			+ "\n\tdefault (no suffix) [s]"
 			+ "\n\t <stamp>ns [ns]"
 			+ "\n\t <stamp>mics [micro seconds]"
 			+ "\n\t <stamp>s [s]"
 			+ "\n\t <stamp>ms [milli seconds]";
-	private static final String ms = "ms";
-	private static final String ns = "ns";
-	private static final String mics = "\u00B5s";
-	private static final String s = "s";
 
 	@FXML
 	private ImageView mImageView;
